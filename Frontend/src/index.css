@@ -1,0 +1,27 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    font-family: 'Inter', sans-serif;
+  }
+  
+  h1, h2, h3, .font-headline {
+    font-family: 'Manrope', sans-serif;
+  }
+}
+
+@layer components {
+  .glass-nav {
+    backdrop-filter: blur(20px);
+  }
+  
+  .tonal-shift-bottom {
+    box-shadow: 0 4px 30px rgba(0, 25, 69, 0.06);
+  }
+  
+  .material-symbols-outlined {
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  }
+}
