@@ -14,6 +14,10 @@ import SpecialtyOncology from './pages/SpecialtyOncology'
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Profile from "./pages/Profile";
+import PatientEnquiry from "./pages/PatientEnquiry";
+import OPDBilling from "./pages/OPDBilling";
+import HealthPackageDetails from "./pages/HealthPackageDetails";
+import ProtectedRoute from "./components/auth/ProtectedRoute";
 
 function App() {
   return (
@@ -23,9 +27,26 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/profile" element={<Profile />} />
+        <Route
+          path="/reception/patient-enquiry"
+          element={
+            <ProtectedRoute allowedRoles={["Admin", "Receptionist"]}>
+              <PatientEnquiry />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/reception/opd-billing"
+          element={
+            <ProtectedRoute allowedRoles={["Admin", "Receptionist"]}>
+              <OPDBilling />
+            </ProtectedRoute>
+          }
+        />
         <Route path="/about" element={<About />} />
         <Route path="/doctors" element={<Doctors />} />
         <Route path="/facilities" element={<Facilities />} />
+        <Route path="/facilities/health-packages/:id" element={<HealthPackageDetails />} />
         <Route path="/blog" element={<Blog />} />
         <Route path="/blog/:id" element={<BlogPost />} />
         <Route path="/appointment" element={<Appointment />} />
