@@ -65,7 +65,7 @@ export const adminLogin = async (req, res) => {
   if (email === "admin@gmail.com" && password === "admin123") {
     const token = jwt.sign(
       { role: "admin" },   // 🔥 MUST
-      "secretkey",
+      process.env.JWT_SECRET,
       { expiresIn: "1d" }
     );
 

@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+ import mongoose from "mongoose";
 
 const appointmentSchema = new mongoose.Schema({
   patient: {
@@ -19,4 +19,5 @@ const appointmentSchema = new mongoose.Schema({
 
 const Appointment = mongoose.model("Appointment", appointmentSchema);
 
+// ✅ MUST ADD THIS
 export default Appointment;
