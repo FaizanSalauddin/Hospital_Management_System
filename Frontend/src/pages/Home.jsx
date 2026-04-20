@@ -4,14 +4,18 @@ import SpecialtiesSection from '../components/home/SpecialtiesSection'
 import DoctorsSection from '../components/home/DoctorsSection'
 import AppointmentSection from '../components/home/AppointmentSection'
 import BlogSection from '../components/home/BlogSection'
+import StatsSection from '../components/home/StatsSection'
+import TestimonialsSection from '../components/home/TestimonialsSection'
 
 const Home = () => {
   return (
     <>
       <HeroSection />
+      <StatsSection />
       <AboutSection />
       <SpecialtiesSection />
       <DoctorsSection />
+      <TestimonialsSection />
       <AppointmentSection />
       <BlogSection />
     </>

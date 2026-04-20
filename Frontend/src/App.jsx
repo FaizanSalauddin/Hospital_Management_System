@@ -1,4 +1,5 @@
 import { Routes, Route, useLocation } from 'react-router-dom'
+import { AnimatePresence } from 'framer-motion'
 import Layout from './components/layout/Layout'
 import Home from './pages/Home'
 import About from './pages/About'
@@ -19,19 +20,18 @@ import AdminDashboard from "./pages/AdminDashboard";
 
 function App() {
   const location = useLocation();
-
-  // 👉 check admin route
   const isAdmin = location.pathname.startsWith("/admin");
+
   return (
-    <>
+    <AnimatePresence mode="wait">
       {isAdmin ? (
-        <Routes>
+        <Routes location={location} key={location.pathname}>
           <Route path="/admin-login" element={<AdminLogin />} />
           <Route path="/admin" element={<AdminDashboard />} />
         </Routes>
       ) : (
         <Layout>
-          <Routes>
+          <Routes location={location} key={location.pathname}>
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
@@ -46,13 +46,10 @@ function App() {
             <Route path="/specialty/neurology" element={<SpecialtyNeurology />} />
             <Route path="/specialty/orthopedics" element={<SpecialtyOrthopedics />} />
             <Route path="/specialty/oncology" element={<SpecialtyOncology />} />
-            <Route path="/admin-login" element={<AdminLogin />} />
-            <Route path="/admin" element={<AdminDashboard />} />
           </Routes>
         </Layout>
-      )
-      }
-    </>
+      )}
+    </AnimatePresence>
   );
 }
 
