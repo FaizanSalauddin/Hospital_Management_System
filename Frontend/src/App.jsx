@@ -14,6 +14,8 @@ import SpecialtyOncology from './pages/SpecialtyOncology'
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Profile from "./pages/Profile";
+import AdminLogin from "./pages/AdminLogin";
+import AdminDashboard from "./pages/AdminDashboard";
 
 function App() {
   return (
@@ -33,6 +35,8 @@ function App() {
         <Route path="/specialty/neurology" element={<SpecialtyNeurology />} />
         <Route path="/specialty/orthopedics" element={<SpecialtyOrthopedics />} />
         <Route path="/specialty/oncology" element={<SpecialtyOncology />} />
+        <Route path="/admin-login" element={<AdminLogin />} />
+        <Route path="/admin" element={<AdminDashboard />} />
       </Routes>
     </Layout>
   )

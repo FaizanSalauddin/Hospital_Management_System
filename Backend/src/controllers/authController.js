@@ -1,7 +1,9 @@
 import Patient from "../models/Patient.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import dotenv from "dotenv";
 
+dotenv.config();
 // ✅ REGISTER
 export const register = async (req, res) => {
   try {
@@ -44,13 +46,37 @@ export const login = async (req, res) => {
 
     const token = jwt.sign(
       { id: user._id },
-      "secretkey",
+      process.env.JWT_SECRET,
       { expiresIn: "1d" }
     );
 
     res.json({ token, user });
   } catch (error) {
     console.log("LOGIN ERROR:", error);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+
+// 🔐 ADMIN LOGIN
+export const adminLogin = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    // ⚠️ hardcoded admin (DB se bhi kar sakte ho later)
+    if (email !== process.env.ADMIN_EMAIL || password !== process.env.ADMIN_PASSWORD) {
+      return res.status(400).json({ message: "Invalid admin credentials" });
+    }
+
+    const token = jwt.sign(
+      { role: "admin" },
+      process.env.JWT_SECRET,
+      { expiresIn: "1d" }
+    );
+
+    res.json({ token, role: "admin" });
+
+  } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
