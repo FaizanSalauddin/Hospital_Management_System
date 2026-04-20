@@ -1,5 +1,4 @@
 import jwt from "jsonwebtoken";
-import  dotenv from "dotenv";
 
 const adminMiddleware = (req, res, next) => {
   const token = req.headers.authorization?.split(" ")[1];
@@ -7,10 +6,10 @@ const adminMiddleware = (req, res, next) => {
   if (!token) return res.status(401).json({ message: "No token" });
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const decoded = jwt.verify(token, "secretkey");
 
     if (decoded.role !== "admin") {
-      return res.status(403).json({ message: "Not authorized" });
+      return res.status(403).json({ message: "Not admin" });
     }
 
     next();

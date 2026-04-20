@@ -60,23 +60,17 @@ export const login = async (req, res) => {
 
 // 🔐 ADMIN LOGIN
 export const adminLogin = async (req, res) => {
-  try {
-    const { email, password } = req.body;
+  const { email, password } = req.body;
 
-    // ⚠️ hardcoded admin (DB se bhi kar sakte ho later)
-    if (email !== process.env.ADMIN_EMAIL || password !== process.env.ADMIN_PASSWORD) {
-      return res.status(400).json({ message: "Invalid admin credentials" });
-    }
-
+  if (email === "admin@gmail.com" && password === "admin123") {
     const token = jwt.sign(
-      { role: "admin" },
-      process.env.JWT_SECRET,
+      { role: "admin" },   // 🔥 MUST
+      "secretkey",
       { expiresIn: "1d" }
     );
 
-    res.json({ token, role: "admin" });
-
-  } catch (error) {
-    res.status(500).json({ message: error.message });
+    return res.json({ token });
   }
+
+  res.status(401).json({ message: "Invalid admin" });
 };
