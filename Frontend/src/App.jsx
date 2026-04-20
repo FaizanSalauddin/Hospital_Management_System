@@ -1,4 +1,5 @@
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, useLocation } from 'react-router-dom'
+import { AnimatePresence } from 'framer-motion'
 import Layout from './components/layout/Layout'
 import Home from './pages/Home'
 import About from './pages/About'
@@ -18,45 +19,61 @@ import PatientEnquiry from "./pages/PatientEnquiry";
 import OPDBilling from "./pages/OPDBilling";
 import HealthPackageDetails from "./pages/HealthPackageDetails";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
-
+import AdminLogin from "./pages/AdminLogin";
+import AdminDashboard from "./pages/AdminDashboard";
 function App() {
+  const location = useLocation();
+  const isAdmin = location.pathname.startsWith("/admin");
+
   return (
-    <Layout>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/profile" element={<Profile />} />
-        <Route
-          path="/reception/patient-enquiry"
-          element={
-            <ProtectedRoute allowedRoles={["Admin", "Receptionist"]}>
-              <PatientEnquiry />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/reception/opd-billing"
-          element={
-            <ProtectedRoute allowedRoles={["Admin", "Receptionist"]}>
-              <OPDBilling />
-            </ProtectedRoute>
-          }
-        />
-        <Route path="/about" element={<About />} />
-        <Route path="/doctors" element={<Doctors />} />
-        <Route path="/facilities" element={<Facilities />} />
-        <Route path="/facilities/health-packages/:id" element={<HealthPackageDetails />} />
-        <Route path="/blog" element={<Blog />} />
-        <Route path="/blog/:id" element={<BlogPost />} />
-        <Route path="/appointment" element={<Appointment />} />
-        <Route path="/specialty/cardiology" element={<SpecialtyCardiology />} />
-        <Route path="/specialty/neurology" element={<SpecialtyNeurology />} />
-        <Route path="/specialty/orthopedics" element={<SpecialtyOrthopedics />} />
-        <Route path="/specialty/oncology" element={<SpecialtyOncology />} />
-      </Routes>
-    </Layout>
-  )
+    <AnimatePresence mode="wait">
+      {isAdmin ? (
+        <Routes location={location} key={location.pathname}>
+          <Route path="/admin-login" element={<AdminLogin />} />
+          <Route path="/admin" element={<AdminDashboard />} />
+        </Routes>
+      ) : (
+        <Layout>
+          <Routes location={location} key={location.pathname}>
+            <Route path="/" element={<Home />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/profile" element={<Profile />} />
+
+            <Route
+              path="/reception/patient-enquiry"
+              element={
+                <ProtectedRoute allowedRoles={["Admin", "Receptionist"]}>
+                  <PatientEnquiry />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/reception/opd-billing"
+              element={
+                <ProtectedRoute allowedRoles={["Admin", "Receptionist"]}>
+                  <OPDBilling />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route path="/about" element={<About />} />
+            <Route path="/doctors" element={<Doctors />} />
+            <Route path="/facilities" element={<Facilities />} />
+            <Route path="/facilities/health-packages/:id" element={<HealthPackageDetails />} />
+            <Route path="/blog" element={<Blog />} />
+            <Route path="/blog/:id" element={<BlogPost />} />
+            <Route path="/appointment" element={<Appointment />} />
+            <Route path="/specialty/cardiology" element={<SpecialtyCardiology />} />
+            <Route path="/specialty/neurology" element={<SpecialtyNeurology />} />
+            <Route path="/specialty/orthopedics" element={<SpecialtyOrthopedics />} />
+            <Route path="/specialty/oncology" element={<SpecialtyOncology />} />
+          </Routes>
+        </Layout>
+      )}
+    </AnimatePresence>
+  );
 }
 
 export default App

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import API from "../services/api";
 
 const Appointment = () => {
@@ -16,6 +16,8 @@ const Appointment = () => {
   });
 
   const navigate = useNavigate();
+  const location = useLocation();
+  const selectedDoctorFromState = location.state?.doctor;
 
   // 🔐 Auth check
   useEffect(() => {
@@ -28,14 +30,25 @@ const Appointment = () => {
   // 🔹 Fetch doctors
   useEffect(() => {
     API.get("/doctors")
-      .then(res => setDoctors(res.data))
-      .catch(err => console.log(err));
-  }, []);
+      .then(res => {
+        setDoctors(res.data);
 
-  // 🔹 Departments auto extract
+        if (selectedDoctorFromState) {
+          const doctor = res.data.find(d => d._id === selectedDoctorFromState._id);
+          if (doctor) {
+            setForm(prev => ({
+              ...prev,
+              department: doctor.specialization,
+              doctor: doctor._id
+            }));
+          }
+        }
+      })
+      .catch(err => console.log(err));
+  }, [selectedDoctorFromState]);
+
   const departments = [...new Set(doctors.map(doc => doc.specialization))];
 
-  // 🔹 Filter doctors by department
   useEffect(() => {
     if (form.department) {
       const filtered = doctors.filter(
@@ -47,12 +60,10 @@ const Appointment = () => {
     }
   }, [form.department, doctors]);
 
-  // 🔹 Phone validation
   const isValidPhone = (phone) => {
     return /^[6-9]\d{9}$/.test(phone);
   };
 
-  // 🔹 Date validation
   const isValidDate = (selectedDate) => {
     const date = new Date(selectedDate);
 
@@ -62,7 +73,6 @@ const Appointment = () => {
     return !(day === 0 || day === 6);
   };
 
-  // 🔹 Generate time slots from doctor availability
   const generateSlots = (timeRange) => {
     if (!timeRange) return [];
 
@@ -89,12 +99,10 @@ const Appointment = () => {
     return slots;
   };
 
-  // 🔹 Selected doctor
   const selectedDoctor = doctors.find(d => d._id === form.doctor);
-
   const timeSlots = generateSlots(selectedDoctor?.availableTime);
 
-  // 🔹 Submit
+  // ✅ FIXED SUBMIT
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -111,56 +119,79 @@ const Appointment = () => {
     }
 
     try {
-      await API.post("/appointments", form);
+      const token = localStorage.getItem("token");
+
+      await API.post("/appointments", form, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
       alert("Appointment Booked ✅");
       navigate("/profile");
     } catch (err) {
+      console.log(err);
       alert("Error booking appointment");
     }
   };
 
   return (
-    <div className="pt-32 pb-20 bg-blue-50 min-h-screen">
+    <div className="pt-32 pb-20 bg-gradient-to-br from-blue-50 to-indigo-50 min-h-screen">
       <div className="container mx-auto px-6 max-w-3xl">
 
         <div className="bg-white rounded-2xl shadow-xl p-8 md:p-10">
 
-          <h1 className="text-3xl md:text-4xl font-bold text-center mb-8">
+          <h1 className="text-3xl md:text-4xl font-bold text-center mb-8 bg-gradient-to-r from-blue-700 to-indigo-700 bg-clip-text text-transparent">
             Book Appointment
           </h1>
 
+          {selectedDoctorFromState && (
+            <div className="mb-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full flex items-center justify-center text-white font-bold text-xl">
+                  {selectedDoctorFromState.name?.charAt(0)}
+                </div>
+                <div>
+                  <p className="text-sm text-gray-600">Booking appointment with:</p>
+                  <p className="font-semibold text-gray-800">{selectedDoctorFromState.name}</p>
+                  <p className="text-sm text-blue-600">{selectedDoctorFromState.specialization}</p>
+                </div>
+              </div>
+            </div>
+          )}
+
           <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-            {/* Name */}
             <div className="col-span-2">
-              <label className="text-sm font-semibold">Full Name</label>
+              <label className="text-sm font-semibold text-gray-700 mb-2 block">Full Name</label>
               <input
                 type="text"
                 placeholder="Enter your name"
-                className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-full p-3 border border-gray-300 rounded-lg"
                 onChange={(e) => setForm({ ...form, name: e.target.value })}
+                value={form.name}
               />
             </div>
 
-            {/* Phone */}
             <div>
-              <label className="text-sm font-semibold">Phone</label>
+              <label className="text-sm font-semibold text-gray-700 mb-2 block">Phone Number</label>
               <input
-                type="text"
+                type="tel"
                 placeholder="10 digit number"
-                className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-full p-3 border border-gray-300 rounded-lg"
                 onChange={(e) => setForm({ ...form, phone: e.target.value })}
+                value={form.phone}
               />
             </div>
 
-            {/* Department */}
             <div>
-              <label className="text-sm font-semibold">Department</label>
+              <label className="text-sm font-semibold text-gray-700 mb-2 block">Department</label>
               <select
-                className="w-full p-3 border rounded-lg"
+                className="w-full p-3 border border-gray-300 rounded-lg"
                 onChange={(e) =>
                   setForm({ ...form, department: e.target.value, doctor: "" })
                 }
+                value={form.department}
               >
                 <option value="">Select Department</option>
                 {departments.map((dept, i) => (
@@ -169,38 +200,40 @@ const Appointment = () => {
               </select>
             </div>
 
-            {/* Doctor */}
             <div className="col-span-2">
-              <label className="text-sm font-semibold">Select Doctor</label>
+              <label className="text-sm font-semibold text-gray-700 mb-2 block">Select Doctor</label>
               <select
-                className="w-full p-3 border rounded-lg"
+                className="w-full p-3 border border-gray-300 rounded-lg"
                 onChange={(e) => setForm({ ...form, doctor: e.target.value })}
+                value={form.doctor}
+                disabled={!form.department}
               >
-                <option value="">Select Doctor</option>
+                <option value="">{form.department ? "Select Doctor" : "First select department"}</option>
                 {filteredDoctors.map(doc => (
                   <option key={doc._id} value={doc._id}>
-                    {doc.name} ({doc.specialization})
+                    {doc.name} ({doc.specialization}) - {doc.availableTime}
                   </option>
                 ))}
               </select>
             </div>
 
-            {/* Date */}
             <div>
-              <label className="text-sm font-semibold">Preferred Date</label>
+              <label className="text-sm font-semibold text-gray-700 mb-2 block">Preferred Date</label>
               <input
                 type="date"
-                className="w-full p-3 border rounded-lg"
+                className="w-full p-3 border border-gray-300 rounded-lg"
                 onChange={(e) => setForm({ ...form, date: e.target.value })}
+                value={form.date}
               />
             </div>
 
-            {/* Time */}
             <div>
-              <label className="text-sm font-semibold">Time Slot</label>
+              <label className="text-sm font-semibold text-gray-700 mb-2 block">Time Slot</label>
               <select
-                className="w-full p-3 border rounded-lg"
+                className="w-full p-3 border border-gray-300 rounded-lg"
                 onChange={(e) => setForm({ ...form, time: e.target.value })}
+                value={form.time}
+                disabled={!form.doctor}
               >
                 <option value="">Select Time</option>
                 {timeSlots.map((slot, i) => (
@@ -209,9 +242,8 @@ const Appointment = () => {
               </select>
             </div>
 
-            {/* Button */}
             <div className="col-span-2 mt-4">
-              <button className="w-full bg-blue-700 hover:bg-blue-800 text-white py-4 rounded-full font-bold text-lg transition">
+              <button className="w-full bg-blue-600 text-white py-3 rounded-full">
                 Request Appointment
               </button>
             </div>
