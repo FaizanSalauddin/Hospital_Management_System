@@ -15,6 +15,7 @@ const AdminLogin = () => {
 
     try {
       const res = await API.post("/auth/admin-login", form);
+      localStorage.removeItem("token");
       localStorage.setItem("adminToken", res.data.token);
       alert("Admin Login Successful ✅");
       navigate("/admin");

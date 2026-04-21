@@ -17,6 +17,7 @@ const Login = () => {
 
         try {
             const res = await API.post("/auth/login", form);
+            localStorage.removeItem("adminToken");
             localStorage.setItem("token", res.data.token);
             localStorage.setItem("user", JSON.stringify(res.data.user));
             alert("Login Successful ✅");

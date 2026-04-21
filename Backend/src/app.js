@@ -31,4 +31,3 @@ app.use("/api/health-packages", healthPackageRoutes);
 app.use("/api/admin", adminRoutes);
 
 export default app;
-export default app;
