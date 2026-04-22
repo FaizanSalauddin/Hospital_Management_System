@@ -4,15 +4,12 @@ const API = axios.create({
   baseURL: "http://localhost:5000/api",
 });
 
-// 🔐 smart token attach
+// 🔐 attach admin token
 API.interceptors.request.use((req) => {
-  const adminToken = localStorage.getItem("adminToken");
-  const userToken = localStorage.getItem("token");
+  const token = localStorage.getItem("adminToken");
 
-  if (adminToken) {
-    req.headers.Authorization = `Bearer ${adminToken}`;
-  } else if (userToken) {
-    req.headers.Authorization = `Bearer ${userToken}`;
+  if (token) {
+    req.headers.Authorization = `Bearer ${token}`;
   }
 
   return req;

@@ -224,6 +224,48 @@ const AdminDashboard = () => {
               <span className="ml-auto bg-gray-700 px-2 py-0.5 rounded-full text-xs">{appointments.length}</span>
             )}
           </button>
+<<<<<<< HEAD
+=======
+
+          <button
+            onClick={() => {
+              navigate("/admin/opd-billing");
+              setSidebarOpen(false);
+            }}
+            className="flex items-center w-full px-4 py-3 rounded-xl transition-all duration-200 text-gray-300 hover:bg-gray-700 hover:text-white"
+          >
+            <svg className="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6M7 4h10a2 2 0 012 2v12a2 2 0 01-2 2H7a2 2 0 01-2-2V6a2 2 0 012-2z"></path>
+            </svg>
+            OPD Billing
+          </button>
+
+          <button
+            onClick={() => {
+              navigate("/admin/patient-enquiry");
+              setSidebarOpen(false);
+            }}
+            className="flex items-center w-full px-4 py-3 rounded-xl transition-all duration-200 text-gray-300 hover:bg-gray-700 hover:text-white"
+          >
+            <svg className="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7a4 4 0 118 0 4 4 0 01-8 0zm-4 14a8 8 0 0116 0"></path>
+            </svg>
+            Patient Enquiry
+          </button>
+
+          <button
+            onClick={() => {
+              navigate("/admin/ipd-bed-allocation");
+              setSidebarOpen(false);
+            }}
+            className="flex items-center w-full px-4 py-3 rounded-xl transition-all duration-200 text-gray-300 hover:bg-gray-700 hover:text-white"
+          >
+            <svg className="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 7h18M3 12h18M3 17h18"></path>
+            </svg>
+            IPD Bed Allocation
+          </button>
+>>>>>>> 7dc3d6b (Finalize admin auth, OPD billing, patient enquiry and IPD module)
         </div>
 
         <button

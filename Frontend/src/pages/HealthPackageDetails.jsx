@@ -53,28 +53,6 @@ const HealthPackageDetails = () => {
     fetchPackageDetails();
   }, [id]);
 
-  const handleUseInBilling = () => {
-    if (!healthPackage) return;
-
-    const selectedPackage = {
-      id: healthPackage._id,
-      packageName: healthPackage.packageName,
-      includedServices: healthPackage.includedServices || [],
-    };
-
-    // Keep a fallback transport in case route state is unavailable after navigation.
-    sessionStorage.setItem(
-      "selectedHealthPackageForBilling",
-      JSON.stringify(selectedPackage)
-    );
-
-    navigate("/reception/opd-billing", {
-      state: {
-        selectedPackage,
-      },
-    });
-  };
-
   if (loading) {
     return (
       <div className="pt-32 pb-20 px-6">
@@ -119,13 +97,9 @@ const HealthPackageDetails = () => {
           </ul>
 
           <div className="flex gap-3">
-            <button
-              type="button"
-              onClick={handleUseInBilling}
-              className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-semibold"
-            >
-              Use in Billing
-            </button>
+            <p className="text-gray-500 mt-2">
+              Billing is available at hospital reception/admin desk.
+            </p>
             <button
               type="button"
               onClick={() => navigate("/facilities")}

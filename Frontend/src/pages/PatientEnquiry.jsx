@@ -1,11 +1,20 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import API from "../services/api";
+import { useNavigate } from "react-router-dom";
 
 const PatientEnquiry = () => {
+  const navigate = useNavigate();
   const [query, setQuery] = useState("");
   const [patients, setPatients] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    const adminToken = localStorage.getItem("adminToken");
+    if (!adminToken) {
+      navigate("/admin/login");
+    }
+  }, [navigate]);
 
   const handleSearch = async (e) => {
     e.preventDefault();

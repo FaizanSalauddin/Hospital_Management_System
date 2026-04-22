@@ -25,21 +25,22 @@ import Store from "./pages/Store";
 import Cart from './pages/Cart';
 import Checkout from './pages/Checkout';
 import PurchaseSuccess from './pages/PurchaseSuccess';
-import { useState } from 'react';
-import { useEffect } from 'react';
+import IPDBedAllocation from "./pages/IPDBedAllocation";
+import AdminIPDBedManagement from "./pages/AdminIPDBedManagement";
+import { useState, useEffect } from 'react';
+
 function App() {
   const location = useLocation();
   const isAdmin = location.pathname.startsWith("/admin");
+
   const [cart, setCart] = useState(() => {
     const savedCart = localStorage.getItem("cart");
     return savedCart ? JSON.parse(savedCart) : [];
   });
 
   useEffect(() => {
-    // Check if we just came from a successful order
     const justOrdered = sessionStorage.getItem("justOrdered");
     if (!justOrdered) {
-      // Only clear cart if not just ordered
       const savedCart = localStorage.getItem("cart");
       if (savedCart) {
         setCart(JSON.parse(savedCart));
@@ -48,6 +49,7 @@ function App() {
       sessionStorage.removeItem("justOrdered");
     }
   }, []);
+
   const addToCart = (item) => {
     setCart(prevCart => {
       const existingItem = prevCart.find(i => i._id === item._id);
@@ -79,13 +81,16 @@ function App() {
     setCart([]);
   };
 
-
   return (
     <AnimatePresence mode="wait">
       {isAdmin ? (
         <Routes location={location} key={location.pathname}>
           <Route path="/admin-login" element={<AdminLogin />} />
+          <Route path="/admin/login" element={<AdminLogin />} />
           <Route path="/admin" element={<AdminDashboard />} />
+          <Route path="/admin/opd-billing" element={<OPDBilling />} />
+          <Route path="/admin/patient-enquiry" element={<PatientEnquiry />} />
+          <Route path="/admin/ipd-bed-allocation" element={<AdminIPDBedManagement />} />
         </Routes>
       ) : (
         <Layout>
@@ -115,12 +120,16 @@ function App() {
 
             <Route path="/about" element={<About />} />
             <Route path="/doctors" element={<Doctors />} />
+
             <Route path="/store" element={<Store addToCart={addToCart} cart={cart} />} />
             <Route path="/cart" element={<Cart cart={cart} removeFromCart={removeFromCart} updateQuantity={updateQuantity} clearCart={clearCart} />} />
             <Route path="/checkout" element={<Checkout cart={cart} clearCart={clearCart} />} />
             <Route path="/purchase-success" element={<PurchaseSuccess />} />
+
             <Route path="/facilities" element={<Facilities />} />
             <Route path="/facilities/health-packages/:id" element={<HealthPackageDetails />} />
+            <Route path="/ipd-bed-allocation" element={<IPDBedAllocation />} />
+
             <Route path="/blog" element={<Blog />} />
             <Route path="/blog/:id" element={<BlogPost />} />
             <Route path="/appointment" element={<Appointment />} />
@@ -135,4 +144,4 @@ function App() {
   );
 }
 
-export default App
+export default App;
