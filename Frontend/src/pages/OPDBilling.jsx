@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import API from "../services/api";
 import OPDBillInvoice from "../components/ui/OPDBillInvoice";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const emptyServiceRow = {
   serviceName: "",
@@ -35,8 +35,11 @@ const loadRazorpayScript = () =>
 
 const OPDBilling = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const [patients, setPatients] = useState([]);
   const [servicesMaster, setServicesMaster] = useState([]);
+  const [patientSearch, setPatientSearch] = useState("");
+  const [billHistory, setBillHistory] = useState([]);
   const [loadingData, setLoadingData] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [paying, setPaying] = useState(false);
@@ -45,6 +48,7 @@ const OPDBilling = () => {
   const [currentBill, setCurrentBill] = useState(null);
   const [paymentMethod, setPaymentMethod] = useState("Cash");
   const [paymentAmount, setPaymentAmount] = useState("");
+  const [showToast, setShowToast] = useState(false);
 
   const [patientId, setPatientId] = useState("");
   const [services, setServices] = useState([{ ...emptyServiceRow }]);
@@ -52,6 +56,13 @@ const OPDBilling = () => {
 
   const normalizeServiceName = (value = "") =>
     value.toString().trim().toLowerCase().replace(/[^a-z0-9]/g, "");
+
+  useEffect(() => {
+    const token = localStorage.getItem("adminToken");
+    if (!token) {
+      navigate("/admin/login");
+    }
+  }, [navigate]);
 
   useEffect(() => {
     const fetchInitialData = async () => {
@@ -133,6 +144,33 @@ const OPDBilling = () => {
 
     return patients.find((p) => p._id === billPatientId) || null;
   }, [currentBill, patients]);
+
+  const filteredPatients = useMemo(() => {
+    const q = patientSearch.trim().toLowerCase();
+    if (!q) return patients;
+    return patients.filter((p) => {
+      const name = (p.name || "").toLowerCase();
+      const phone = (p.phone || "").toLowerCase();
+      return name.includes(q) || phone.includes(q);
+    });
+  }, [patients, patientSearch]);
+
+  useEffect(() => {
+    const fetchBillHistory = async () => {
+      if (!patientId) {
+        setBillHistory([]);
+        return;
+      }
+      try {
+        const res = await API.get(`/opd-billing/patient/${patientId}`);
+        setBillHistory((res.data || []).slice(0, 10));
+      } catch {
+        setBillHistory([]);
+      }
+    };
+
+    fetchBillHistory();
+  }, [patientId]);
 
   const updateServiceRow = (index, field, value) => {
     setServices((prev) => {
@@ -218,6 +256,8 @@ const OPDBilling = () => {
             : Number(payload.finalAmount),
       });
       setSuccess(`Bill generated successfully. Bill ID: ${res.data?._id || "N/A"}`);
+      setShowToast(true);
+      setTimeout(() => setShowToast(false), 3000);
     } catch (err) {
       setError(getApiErrorMessage(err, "Failed to generate OPD bill."));
     } finally {
@@ -328,13 +368,29 @@ const OPDBilling = () => {
     <div className="pt-32 pb-20 bg-blue-50 min-h-screen">
       <div className="container mx-auto px-6 max-w-6xl">
         <div className="bg-white rounded-2xl shadow-xl p-8 md:p-10">
-          <h1 className="text-3xl md:text-4xl font-bold mb-8">Reception OPD Billing</h1>
+          <h1 className="text-3xl md:text-4xl font-bold mb-8">Admin OPD Billing</h1>
 
           {loadingData ? (
             <p className="text-slate-600">Loading patients and services...</p>
           ) : (
             <form onSubmit={handleGenerateBill} className="space-y-6">
-              <div>
+              {showToast && (
+                <div className="fixed top-20 right-6 z-50 bg-green-600 text-white px-5 py-3 rounded-lg shadow-lg">
+                  Bill Generated Successfully
+                </div>
+              )}
+
+              <div className="print:hidden">
+                <label className="text-sm font-semibold block mb-2">Search Patient (Name / Phone)</label>
+                <input
+                  value={patientSearch}
+                  onChange={(e) => setPatientSearch(e.target.value)}
+                  placeholder="Search patient..."
+                  className="w-full p-3 border rounded-lg"
+                />
+              </div>
+
+              <div className="print:hidden">
                 <label className="text-sm font-semibold block mb-2">Select Patient</label>
                 <select
                   value={patientId}
@@ -342,7 +398,7 @@ const OPDBilling = () => {
                   className="w-full p-3 border rounded-lg"
                 >
                   <option value="">Choose patient</option>
-                  {patients.map((patient) => (
+                  {filteredPatients.map((patient) => (
                     <option key={patient._id} value={patient._id}>
                       {patient.name} {patient.phone ? `(${patient.phone})` : ""}
                     </option>
@@ -350,7 +406,7 @@ const OPDBilling = () => {
                 </select>
               </div>
 
-              <div>
+              <div className="print:hidden">
                 <div className="flex justify-between items-center mb-3">
                   <h2 className="text-xl font-bold">Billable Services</h2>
                   <button
@@ -427,7 +483,7 @@ const OPDBilling = () => {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 print:hidden">
                 <div className="bg-blue-50 rounded-lg p-4">
                   <p className="text-sm text-slate-600">Subtotal</p>
                   <p className="text-2xl font-bold">Rs. {subtotal.toFixed(2)}</p>
@@ -445,7 +501,7 @@ const OPDBilling = () => {
               {success && <p className="text-green-700 font-medium">{success}</p>}
 
               {currentBill && (
-                <div className="border rounded-lg p-4 bg-slate-50">
+                <div className="border rounded-lg p-4 bg-slate-50 print:hidden">
                   <h3 className="font-bold text-lg mb-2">Latest Generated Bill</h3>
                   <p className="text-sm text-slate-700 mb-1">Bill ID: {currentBill._id}</p>
                   <p className="text-sm text-slate-700 mb-3">
@@ -518,11 +574,26 @@ const OPDBilling = () => {
                 />
               )}
 
+              {billHistory.length > 0 && (
+                <div className="border rounded-lg p-4 bg-slate-50 print:hidden">
+                  <h3 className="font-bold text-lg mb-3">Recent Bills (Last 10)</h3>
+                  <div className="space-y-2 text-sm">
+                    {billHistory.map((bill) => (
+                      <div key={bill._id} className="flex justify-between border-b pb-1">
+                        <span>{bill._id}</span>
+                        <span>Rs. {Number(bill.finalAmount || 0).toFixed(2)}</span>
+                        <span>{bill.paymentStatus}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               {!currentBill && (
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="w-full bg-blue-700 hover:bg-blue-800 text-white py-4 rounded-full font-bold text-lg transition disabled:opacity-70"
+                  className="w-full bg-blue-700 hover:bg-blue-800 text-white py-4 rounded-full font-bold text-lg transition disabled:opacity-70 print:hidden"
                 >
                   {submitting ? "Generating..." : "Generate Bill"}
                 </button>

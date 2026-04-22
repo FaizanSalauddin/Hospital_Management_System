@@ -1,5 +1,6 @@
 import express from "express";
 import authMiddleware from "../../middleware/authMiddleware.js";
+import { protectAdmin } from "../../middleware/adminMiddleware.js";
 import {
   createOPDBill,
   getPatientBills,
@@ -11,7 +12,7 @@ import {
 
 const router = express.Router();
 
-router.post("/", authMiddleware, createOPDBill);
+router.post("/", protectAdmin, createOPDBill);
 router.get("/patient/:patientId", authMiddleware, getPatientBills);
 router.put("/:id/pay", authMiddleware, markBillPaid);
 router.post("/:id/razorpay-order", authMiddleware, createRazorpayOrder);

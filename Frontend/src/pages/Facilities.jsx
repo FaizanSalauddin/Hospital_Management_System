@@ -57,34 +57,11 @@ const Facilities = () => {
 
         {activeTab === "OPD" ? (
           <div className="pb-12 space-y-8">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="bg-white rounded-2xl shadow p-6 border border-slate-100">
-                <h2 className="text-2xl font-bold mb-2">Patient Enquiry</h2>
-                <p className="text-slate-600 mb-5">
-                  Search patients by UHID, name, or phone at reception.
-                </p>
-                <button
-                  type="button"
-                  onClick={() => navigate("/reception/patient-enquiry")}
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg font-semibold"
-                >
-                  Open Patient Enquiry
-                </button>
-              </div>
-
-              <div className="bg-white rounded-2xl shadow p-6 border border-slate-100">
-                <h2 className="text-2xl font-bold mb-2">OPD Billing</h2>
-                <p className="text-slate-600 mb-5">
-                  Create OPD bills, manage services, and print invoices.
-                </p>
-                <button
-                  type="button"
-                  onClick={() => navigate("/reception/opd-billing")}
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg font-semibold"
-                >
-                  Open OPD Billing
-                </button>
-              </div>
+            <div className="bg-white rounded-2xl shadow p-6 border border-slate-100">
+              <h2 className="text-2xl font-bold mb-2">Reception Services</h2>
+              <p className="text-slate-600">
+                OPD Billing and Patient Enquiry are available at hospital reception/admin desk.
+              </p>
             </div>
 
             <div>
@@ -113,9 +90,20 @@ const Facilities = () => {
           </div>
         ) : (
           <div className="pb-12">
-            <div className="bg-white rounded-2xl shadow p-6 border border-slate-100">
-              <h2 className="text-2xl font-bold mb-2">IPD</h2>
-              <p className="text-slate-600">IPD facilities content coming soon...</p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="bg-white rounded-2xl shadow p-6 border border-slate-100">
+                <h2 className="text-2xl font-bold mb-2">Bed Allocation</h2>
+                <p className="text-slate-600 mb-5">
+                  Allocate, transfer, and discharge IPD beds with live occupancy status.
+                </p>
+                <button
+                  type="button"
+                  onClick={() => navigate("/ipd-bed-allocation")}
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg font-semibold"
+                >
+                  Open Bed Allocation
+                </button>
+              </div>
             </div>
           </div>
         )}

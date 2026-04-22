@@ -1,21 +1,31 @@
 import jwt from "jsonwebtoken";
 
-const adminMiddleware = (req, res, next) => {
-  const token = req.headers.authorization?.split(" ")[1];
+const JWT_SECRET = process.env.JWT_SECRET || "secretkey";
 
-  if (!token) return res.status(401).json({ message: "No token" });
-
+export const protectAdmin = (req, res, next) => {
   try {
-    const decoded = jwt.verify(token, "secretkey");
+    const authHeader = req.headers.authorization;
 
-    if (decoded.role !== "admin") {
-      return res.status(403).json({ message: "Not admin" });
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return res.status(401).json({ message: "No token provided" });
     }
 
+    const token = authHeader.split(" ")[1];
+    const decoded = jwt.verify(token, JWT_SECRET);
+
+    if (decoded.role !== "admin") {
+      return res.status(403).json({
+        message: "Access denied. Admin only.",
+      });
+    }
+
+    req.user = decoded;
     next();
-  } catch (err) {
-    res.status(401).json({ message: "Invalid token" });
+  } catch (error) {
+    return res.status(401).json({
+      message: "Invalid or expired token",
+    });
   }
 };
 
-export default adminMiddleware;
+export default protectAdmin;
