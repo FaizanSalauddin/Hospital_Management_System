@@ -18,7 +18,7 @@ const Appointment = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const selectedDoctorFromState = location.state?.doctor;
-
+  const specialtyData = location.state || {};
   // 🔐 Auth check
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -47,6 +47,19 @@ const Appointment = () => {
       .catch(err => console.log(err));
   }, [selectedDoctorFromState]);
 
+  useEffect(() => {
+    if (specialtyData.specialty) {
+      // Auto-fill the department select
+      const departmentSelect = document.querySelector('select[name="department"]');
+      if (departmentSelect) {
+        departmentSelect.value = specialtyData.specialty;
+      }
+    }
+    if (specialtyData.doctor) {
+      // Auto-fill doctor name or show notification
+      console.log(`Selected doctor: ${specialtyData.doctor}`);
+    }
+  }, [specialtyData]);
   const departments = [...new Set(doctors.map(doc => doc.specialization))];
 
   useEffect(() => {
