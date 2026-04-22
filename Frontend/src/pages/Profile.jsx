@@ -7,7 +7,7 @@ const Profile = () => {
   const [user, setUser] = useState(null);
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [orders, setOrders] = useState([]);
+
   
   const navigate = useNavigate();
 
@@ -39,14 +39,7 @@ const Profile = () => {
     fetchAppointments();
   }, []);
 
-  useEffect(() => {
-    const fetchOrders = async () => {
-      const res = await API.get("/orders");
-      setOrders(res.data);
-    };
-
-    fetchOrders();
-  }, []);
+ 
 
   // 🔹 logout
   const handleLogout = () => {
