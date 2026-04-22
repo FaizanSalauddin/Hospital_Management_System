@@ -21,9 +21,64 @@ import HealthPackageDetails from "./pages/HealthPackageDetails";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import AdminLogin from "./pages/AdminLogin";
 import AdminDashboard from "./pages/AdminDashboard";
+import Store from "./pages/Store";
+import Cart from './pages/Cart';
+import Checkout from './pages/Checkout';
+import PurchaseSuccess from './pages/PurchaseSuccess';
+import { useState } from 'react';
+import { useEffect } from 'react';
 function App() {
   const location = useLocation();
   const isAdmin = location.pathname.startsWith("/admin");
+  const [cart, setCart] = useState(() => {
+    const savedCart = localStorage.getItem("cart");
+    return savedCart ? JSON.parse(savedCart) : [];
+  });
+
+  useEffect(() => {
+    // Check if we just came from a successful order
+    const justOrdered = sessionStorage.getItem("justOrdered");
+    if (!justOrdered) {
+      // Only clear cart if not just ordered
+      const savedCart = localStorage.getItem("cart");
+      if (savedCart) {
+        setCart(JSON.parse(savedCart));
+      }
+    } else {
+      sessionStorage.removeItem("justOrdered");
+    }
+  }, []);
+  const addToCart = (item) => {
+    setCart(prevCart => {
+      const existingItem = prevCart.find(i => i._id === item._id);
+      if (existingItem) {
+        return prevCart.map(i =>
+          i._id === item._id ? { ...i, quantity: (i.quantity || 1) + 1 } : i
+        );
+      }
+      return [...prevCart, { ...item, quantity: 1 }];
+    });
+  };
+
+  const removeFromCart = (itemId) => {
+    setCart(prev => prev.filter(item => item._id !== itemId));
+  };
+
+  const updateQuantity = (itemId, delta) => {
+    setCart(prev => prev.map(item => {
+      if (item._id === itemId) {
+        const newQuantity = (item.quantity || 1) + delta;
+        if (newQuantity <= 0) return null;
+        return { ...item, quantity: newQuantity };
+      }
+      return item;
+    }).filter(Boolean));
+  };
+
+  const clearCart = () => {
+    setCart([]);
+  };
+
 
   return (
     <AnimatePresence mode="wait">
@@ -60,6 +115,10 @@ function App() {
 
             <Route path="/about" element={<About />} />
             <Route path="/doctors" element={<Doctors />} />
+            <Route path="/store" element={<Store addToCart={addToCart} cart={cart} />} />
+            <Route path="/cart" element={<Cart cart={cart} removeFromCart={removeFromCart} updateQuantity={updateQuantity} clearCart={clearCart} />} />
+            <Route path="/checkout" element={<Checkout cart={cart} clearCart={clearCart} />} />
+            <Route path="/purchase-success" element={<PurchaseSuccess />} />
             <Route path="/facilities" element={<Facilities />} />
             <Route path="/facilities/health-packages/:id" element={<HealthPackageDetails />} />
             <Route path="/blog" element={<Blog />} />

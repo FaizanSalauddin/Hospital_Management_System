@@ -8,7 +8,7 @@ import serviceMasterRoutes from "./routes/serviceMasterRoutes.js";
 import opdBillingRoutes from "./routes/opdBillingRoutes.js";
 import healthPackageRoutes from "./routes/healthPackageRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
-
+import storeRoutes from "./routes/storeRoutes.js";
 
 const app = express();
 
@@ -22,6 +22,7 @@ app.get("/", (req, res) => {
 });
 app.use("/api/patients", patientRoutes);
 app.use("/api/doctors", doctorRoutes);
+app.use("/api/store", storeRoutes);
 app.use("/api/appointments", appointmentRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/service-master", serviceMasterRoutes);
