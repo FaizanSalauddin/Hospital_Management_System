@@ -14,26 +14,21 @@ import ipdBedRoutes from "./routes/ipdBedRoutes.js";
 
 const app = express();
 
-// middleware
 app.use(cors());
 app.use(express.json());
 
-// test route
 app.get("/", (req, res) => {
   res.send("API is running...");
 });
-
-/* ================= ROUTES ================= */
 
 app.use("/api/patients", patientRoutes);
 app.use("/api/doctors", doctorRoutes);
 app.use("/api/store", storeRoutes);
 app.use("/api/appointments", appointmentRoutes);
 app.use("/api/auth", authRoutes);
-app.use("/api/service-master", serviceMasterRoutes);
+
 app.use("/api/services", serviceMasterRoutes);
 
-// OPD
 app.use("/api/opd-billing", opdBillingRoutes);
 app.use("/api/health-packages", healthPackageRoutes);
 
